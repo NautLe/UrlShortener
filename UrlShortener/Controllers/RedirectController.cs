@@ -1,34 +1,67 @@
 using Microsoft.AspNetCore.Mvc;
 using UrlShortener.Data;
+using UrlShortener.Models;
+using System;
+using System.Linq;
 
 namespace UrlShortener.Controllers
 {
-    public class RedirectController : Controller
+    [ApiController]
+    [Route("api/[controller]")]
+    public class UrlController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
 
-        public RedirectController(ApplicationDbContext context)
+        public UrlController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        public IActionResult Go(string shortCode)
+        // POST: api/url/shorten
+        [HttpPost("shorten")]
+        public IActionResult Shorten([FromBody] string originalUrl)
         {
-            var link = _context.ShortUrls.FirstOrDefault(x => x.ShortCode == shortCode);
-            if (link == null)
+            if (string.IsNullOrWhiteSpace(originalUrl) || !Uri.IsWellFormedUriString(originalUrl, UriKind.Absolute))
+                return BadRequest("Invalid URL format.");
+
+            var shortCode = Guid.NewGuid().ToString().Substring(0, 6);
+
+            // Check for collisions (rare, but safer)
+            while (_context.ShortUrls.Any(u => u.ShortCode == shortCode))
             {
-                return NotFound("Short link not found.");
+                shortCode = Guid.NewGuid().ToString().Substring(0, 6);
             }
 
-            if (string.IsNullOrWhiteSpace(link.OriginalUrl))
+            var shortUrl = new ShortUrl
             {
-                return BadRequest("The original URL is missing.");
-            }
+                OriginalUrl = originalUrl,
+                ShortCode = shortCode
+            };
 
-            link.ClickCount++;
+            _context.ShortUrls.Add(shortUrl);
             _context.SaveChanges();
 
-            return Redirect(link.OriginalUrl);
+            var result = $"{Request.Scheme}://{Request.Host}/{shortCode}";
+            return Ok(result);
+        }
+
+        [HttpGet("{shortCode}")]
+        public IActionResult GetOriginalUrl(string shortCode)
+        {
+            if (string.IsNullOrWhiteSpace(shortCode))
+                return BadRequest("Short code is required.");
+
+            var link = _context.ShortUrls.FirstOrDefault(u => u.ShortCode == shortCode);
+            if (link == null)
+                return NotFound("Short link not found.");
+
+            return Ok(new
+            {
+                OriginalUrl = link.OriginalUrl,
+                ShortCode = link.ShortCode,
+                ShortUrl = $"{Request.Scheme}://{Request.Host}/{link.ShortCode}",
+                ClickCount = link.ClickCount
+            });
         }
     }
 }
