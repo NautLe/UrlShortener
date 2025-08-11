@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using UrlShortener.Data;
-using System.Linq;
 
 namespace UrlShortener.Controllers
 {
@@ -19,6 +18,11 @@ namespace UrlShortener.Controllers
             if (link == null)
             {
                 return NotFound("Short link not found.");
+            }
+
+            if (string.IsNullOrWhiteSpace(link.OriginalUrl))
+            {
+                return BadRequest("The original URL is missing.");
             }
 
             link.ClickCount++;
