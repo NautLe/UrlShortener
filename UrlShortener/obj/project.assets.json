@@ -4728,11 +4728,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Long\\source\\repos\\UrlShortener\\UrlShortener.csproj",
+      "projectUniqueName": "C:\\Users\\Long\\OneDrive\\Documents\\GitHub\\UrlShortener\\UrlShortener\\UrlShortener.csproj",
       "projectName": "UrlShortener",
-      "projectPath": "C:\\Users\\Long\\source\\repos\\UrlShortener\\UrlShortener.csproj",
+      "projectPath": "C:\\Users\\Long\\OneDrive\\Documents\\GitHub\\UrlShortener\\UrlShortener\\UrlShortener.csproj",
       "packagesPath": "C:\\Users\\Long\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Long\\source\\repos\\UrlShortener\\obj\\",
+      "outputPath": "C:\\Users\\Long\\OneDrive\\Documents\\GitHub\\UrlShortener\\UrlShortener\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

@@ -1,20 +1,36 @@
 ﻿@{
-    ViewData["Title"] = "URL Shortener";
+    ViewData["Title"] = "Home";
 }
 
-<h2>URL Shortener</h2>
+<div class="card">
+    <h2 class="text-center mb-4">Shorten Your Link</h2>
+    <form asp-action="Shorten" method="post">
+        <div class="mb-3">
+            <label for="url" class="form-label">Enter URL</label>
+            <input type="url" class="form-control" id="url" name="originalUrl" placeholder="https://example.com" required />
+        </div>
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Shorten</button>
+        </div>
+    </form>
 
-<form asp-action="Shorten" method="post">
-    <input type="url" name="originalUrl" placeholder="Enter long URL" required style="width: 300px;" />
-    <button type="submit">Shorten</button>
-</form>
+    @if (ViewBag.ShortUrl != null)
+    {
+        <div class="alert alert-success mt-4 text-center">
+            <p>Your short URL is:</p>
+            <input type="text" class="form-control text-center" value="@ViewBag.ShortUrl" id="shortUrl" readonly />
+            <button class="btn btn-success mt-2" onclick="copyToClipboard()">Copy</button>
+        </div>
+    }
+</div>
 
-@if (ViewBag.Error != null)
-{
-    <p style="color:red">@ViewBag.Error</p>
-}
-
-@if (ViewBag.ShortUrl != null)
-{
-    <p>Short URL: <a href="@ViewBag.ShortUrl">@ViewBag.ShortUrl</a></p>
+@section Scripts {
+    <script>
+        function copyToClipboard() {
+            var copyText = document.getElementById("shortUrl");
+            navigator.clipboard.writeText(copyText.value).then(() => {
+                alert("Copied to clipboard!");
+            });
+        }
+    </script>
 }
