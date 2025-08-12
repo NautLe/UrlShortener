@@ -80,7 +80,7 @@
               "RelativeDocumentMoniker": "Services\\ShortCodeGenerator.cs",
               "ToolTip": "C:\\Users\\Long\\source\\repos\\UrlShortener\\Services\\ShortCodeGenerator.cs",
               "RelativeToolTip": "Services\\ShortCodeGenerator.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAiwBUAAAAkAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAjAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-08-12T07:15:06.466Z",
               "EditorCaption": ""
@@ -95,8 +95,7 @@
               "RelativeToolTip": "Views\\Shared\\_Layout.cshtml",
               "ViewState": "AgIAADoAAAAAAAAAAAAIwE8AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-08-11T05:31:23.182Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-11T05:31:23.182Z"
             },
             {
               "$type": "Document",
@@ -120,8 +119,7 @@
               "RelativeToolTip": "Controllers\\HomeController.cs",
               "ViewState": "AgIAACcAAAAAAAAAAAAcwEcAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-09T15:00:40.507Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-09T15:00:40.507Z"
             },
             {
               "$type": "Document",
@@ -133,8 +131,7 @@
               "RelativeToolTip": "Controllers\\RedirectController.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAkwB8AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-09T15:01:23.273Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-09T15:01:23.273Z"
             },
             {
               "$type": "Document",
@@ -146,8 +143,7 @@
               "RelativeToolTip": "Controllers\\UrlController.cs",
               "ViewState": "AgIAACoAAAAAAAAAAAAowEwAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-09T15:01:54.697Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-09T15:01:54.697Z"
             },
             {
               "$type": "Document",
@@ -159,8 +155,7 @@
               "RelativeToolTip": "Program.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-09T14:55:42.436Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-09T14:55:42.436Z"
             },
             {
               "$type": "Document",
