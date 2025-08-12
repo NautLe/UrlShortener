@@ -1,4 +1,5 @@
-﻿@{
+﻿@model UrlShortener.Models.ShortenRequest
+@{
     ViewData["Title"] = "Home";
 }
 
@@ -7,7 +8,8 @@
     <form asp-action="Shorten" method="post">
         <div class="mb-3">
             <label for="url" class="form-label">Enter URL</label>
-            <input type="url" class="form-control" id="url" name="originalUrl" placeholder="https://example.com" required />
+            <input asp-for="OriginalUrl" type="url" class="form-control" id="url" placeholder="https://example.com" />
+            <span asp-validation-for="OriginalUrl" class="text-danger"></span>
         </div>
         <div class="text-center">
             <button type="submit" class="btn btn-primary">Shorten</button>
@@ -28,6 +30,7 @@
 </div>
 
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     <script>
         function copyToClipboard() {
             var copyText = document.getElementById("shortUrl");

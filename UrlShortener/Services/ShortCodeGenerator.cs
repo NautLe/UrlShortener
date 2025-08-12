@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-
-namespace UrlShortener.Services
+﻿namespace UrlShortener.Services
 {
     public class ShortCodeGenerator
     {
-        private readonly Dictionary<string, string> _domainMap = new(StringComparer.OrdinalIgnoreCase)
+        private readonly Dictionary<string, string> _domainMap = new()
         {
             { "youtube.com", "yt" },
             { "facebook.com", "fb" },
@@ -29,29 +24,22 @@ namespace UrlShortener.Services
             { "github.com", "gh" },
             { "microsoft.com", "msft" },
             { "apple.com", "apl" },
+            { "cms.greenwich.edu.vn", "cms" },
+            { "ap.greenwich.edu.vn", "ap" },
         };
 
-        public string Generate(string url)
+        public string Generate(string originalUrl)
         {
-            Uri uri = new(url);
-            string domain = uri.Host.Replace("www.", "");
-            string path = uri.AbsolutePath.Trim('/');
+            if (Uri.TryCreate(originalUrl, UriKind.Absolute, out var uri))
+            {
+                var host = uri.Host.Replace("www.", "");
+                if (_domainMap.TryGetValue(host, out var codePrefix))
+                {
+                    return $"{codePrefix}{Guid.NewGuid().ToString("N")[..4]}";
+                }
+            }
 
-            string domainShort = _domainMap.ContainsKey(domain)
-                ? _domainMap[domain]
-                : new string(domain.Take(3).ToArray());
-
-            string[] pathParts = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
-            string pathShort = string.Concat(pathParts
-                .Select(part => Regex.Replace(part, "[^a-zA-Z0-9]", ""))
-                .Where(clean => !string.IsNullOrEmpty(clean))
-                .Select(clean => clean.Substring(0, Math.Min(3, clean.Length))));
-
-            string finalCode = (domainShort + pathShort).ToLower();
-            if (finalCode.Length > 10)
-                finalCode = finalCode.Substring(0, 10);
-
-            return finalCode;
+            return Guid.NewGuid().ToString("N")[..6];
         }
     }
 }

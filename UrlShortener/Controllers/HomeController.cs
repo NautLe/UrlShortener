@@ -2,70 +2,66 @@
 using UrlShortener.Data;
 using UrlShortener.Models;
 using UrlShortener.Services;
-using System;
-using System.Linq;
 
 namespace UrlShortener.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly ShortCodeGenerator _codeGenerator;
+        private readonly ShortCodeGenerator _generator;
 
-        public HomeController(ApplicationDbContext context, ShortCodeGenerator codeGenerator)
+        public HomeController(ApplicationDbContext context, ShortCodeGenerator generator)
         {
             _context = context;
-            _codeGenerator = codeGenerator;
+            _generator = generator;
         }
 
-        public IActionResult Index() => View();
+        public IActionResult Index()
+        {
+            return View(new ShortenRequest()); 
+        }
 
         [HttpPost]
-        public IActionResult Shorten(string originalUrl)
+        public IActionResult Shorten(ShortenRequest request)
         {
-            if (string.IsNullOrWhiteSpace(originalUrl))
+            if (!ModelState.IsValid)
             {
-                ViewBag.Error = "URL cannot be empty.";
-                return View("Index");
+                return View("Index", request);
             }
 
-            if (!Uri.TryCreate(originalUrl, UriKind.Absolute, out Uri? validatedUri) ||
-                (validatedUri.Scheme != Uri.UriSchemeHttp && validatedUri.Scheme != Uri.UriSchemeHttps))
-            {
-                ViewBag.Error = "Invalid URL format.";
-                return View("Index");
-            }
+            var validatedUrl = request.OriginalUrl!.Trim();
 
-            var existing = _context.ShortUrls.FirstOrDefault(x => x.OriginalUrl == validatedUri.ToString());
+            // Check duplicate
+            var existing = _context.ShortUrls.FirstOrDefault(x => x.OriginalUrl == validatedUrl);
             if (existing != null)
             {
                 ViewBag.ShortUrl = $"{Request.Scheme}://{Request.Host}/{existing.ShortCode}";
-                return View("Index");
+                return View("Index", request);
             }
 
-            var shortCode = _codeGenerator.Generate(validatedUri.ToString());
-
+            // Generate unique shortcode
+            string finalCode = _generator.Generate(validatedUrl);
             int counter = 1;
-            while (_context.ShortUrls.Any(u => u.ShortCode == shortCode))
+            while (_context.ShortUrls.Any(u => u.ShortCode == finalCode))
             {
-                shortCode = shortCode + counter;
-                if (shortCode.Length > 10)
-                    shortCode = shortCode.Substring(0, 10);
+                finalCode = (finalCode.Length >= 45)
+                    ? finalCode.Substring(0, 45)
+                    : finalCode + counter;
                 counter++;
             }
 
             var shortUrl = new ShortUrl
             {
-                OriginalUrl = validatedUri.ToString(),
-                ShortCode = shortCode,
+                OriginalUrl = validatedUrl,
+                ShortCode = finalCode,
                 CreatedAt = DateTime.UtcNow
             };
 
             _context.ShortUrls.Add(shortUrl);
             _context.SaveChanges();
 
-            ViewBag.ShortUrl = $"{Request.Scheme}://{Request.Host}/{shortCode}";
-            return View("Index");
+            ViewBag.ShortUrl = $"{Request.Scheme}://{Request.Host}/{finalCode}";
+            return View("Index", request);
         }
     }
 }

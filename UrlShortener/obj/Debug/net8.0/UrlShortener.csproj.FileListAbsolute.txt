@@ -165,3 +165,7 @@ C:\Users\Long\source\repos\UrlShortener\obj\Debug\net8.0\refint\UrlShortener.dll
 C:\Users\Long\source\repos\UrlShortener\obj\Debug\net8.0\UrlShortener.pdb
 C:\Users\Long\source\repos\UrlShortener\obj\Debug\net8.0\UrlShortener.genruntimeconfig.cache
 C:\Users\Long\source\repos\UrlShortener\obj\Debug\net8.0\ref\UrlShortener.dll
+C:\Users\Long\source\repos\UrlShortener\obj\Debug\net8.0\UrlShortener.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\Long\source\repos\UrlShortener\bin\Debug\net8.0\FluentValidation.dll
+C:\Users\Long\source\repos\UrlShortener\bin\Debug\net8.0\FluentValidation.AspNetCore.dll
+C:\Users\Long\source\repos\UrlShortener\bin\Debug\net8.0\FluentValidation.DependencyInjectionExtensions.dll
