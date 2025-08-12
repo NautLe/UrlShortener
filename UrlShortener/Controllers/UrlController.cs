@@ -82,12 +82,26 @@ namespace UrlShortener.Controllers
 
             Dictionary<string, string> domainMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {
-                { "github.com", "gh" },
+                { "youtube.com", "yt" },
                 { "facebook.com", "fb" },
-                { "google.com", "gg" },
-                { "linkedin.com", "in" },
+                { "instagram.com", "ig" },
                 { "twitter.com", "tw" },
-                { "youtube.com", "yt" }
+                { "x.com", "x" },
+                { "tiktok.com", "tt" },
+                { "reddit.com", "rd" },
+                { "linkedin.com", "in" },
+                { "pinterest.com", "pt" },
+                { "netflix.com", "nf" },
+                { "amazon.com", "amz" },
+                { "google.com", "gg" },
+                { "discord.com", "dc" },
+                { "twitch.tv", "twt" },
+                { "spotify.com", "sp" },
+                { "wikipedia.org", "wiki" },
+                { "stackoverflow.com", "so" },
+                { "github.com", "gh" },
+                { "microsoft.com", "msft" },
+                { "apple.com", "apl" },
             };
 
             string domainShort = domainMap.ContainsKey(domain)
