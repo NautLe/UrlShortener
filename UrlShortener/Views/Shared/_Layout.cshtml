@@ -20,10 +20,10 @@
         }
 
         main {
-            flex: 1; /* Fill space between navbar and footer */
+            flex: 1; 
             display: flex;
-            align-items: center; /* Vertical center */
-            justify-content: center; /* Horizontal center */
+            align-items: center; 
+            justify-content: center; 
         }
 
         .card {
@@ -54,6 +54,9 @@
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="LinksList" asp-action="Index">Manage Links</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
