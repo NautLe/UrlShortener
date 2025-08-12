@@ -21,21 +21,45 @@ namespace UrlShortener.Controllers
         [HttpPost("shorten")]
         public IActionResult Shorten([FromBody] string originalUrl)
         {
-            if (string.IsNullOrWhiteSpace(originalUrl) || !Uri.IsWellFormedUriString(originalUrl, UriKind.Absolute))
-                return BadRequest("Invalid URL format.");
+            if (string.IsNullOrWhiteSpace(originalUrl))
+                return BadRequest("URL cannot be empty.");
 
-            var shortCode = Guid.NewGuid().ToString().Substring(0, 6);
+            if (!Uri.TryCreate(originalUrl, UriKind.Absolute, out Uri? validatedUri) ||
+                (validatedUri.Scheme != Uri.UriSchemeHttp && validatedUri.Scheme != Uri.UriSchemeHttps))
+                return BadRequest("Invalid URL format. Please enter a valid HTTP or HTTPS URL.");
 
-            // Check for collisions (rare, but safer)
-            while (_context.ShortUrls.Any(u => u.ShortCode == shortCode))
+            // Nếu đã tồn tại → trả về luôn
+            var existing = _context.ShortUrls.FirstOrDefault(x => x.OriginalUrl == validatedUri.ToString());
+            if (existing != null)
             {
-                shortCode = Guid.NewGuid().ToString().Substring(0, 6);
+                var existingUrl = $"{Request.Scheme}://{Request.Host}/{existing.ShortCode}";
+                return Ok(existingUrl);
             }
+
+            // Lấy 3 ký tự đầu từ domain
+            var hostPart = validatedUri.Host.Replace("www.", "").Split('.')[0];
+            var shortHost = hostPart.Length > 3 ? hostPart.Substring(0, 3) : hostPart;
+
+            // Lấy 3 ký tự đầu từ mỗi segment trong path
+            var pathSegments = validatedUri.Segments
+                .Select(s => s.Trim('/'))
+                .Where(s => !string.IsNullOrWhiteSpace(s))
+                .Select(s => s.Length > 3 ? s.Substring(0, 3) : s)
+                .ToList();
+
+            // Ghép lại thành short code
+            var combined = shortHost + string.Join("", pathSegments);
+            var shortCode = new string(combined.Where(char.IsLetterOrDigit).ToArray());
+
+            // Nếu trùng → thêm số random
+            if (_context.ShortUrls.Any(x => x.ShortCode == shortCode))
+                shortCode += new Random().Next(10, 99);
 
             var shortUrl = new ShortUrl
             {
-                OriginalUrl = originalUrl,
-                ShortCode = shortCode
+                OriginalUrl = validatedUri.ToString(),
+                ShortCode = shortCode,
+                CreatedAt = DateTime.UtcNow
             };
 
             _context.ShortUrls.Add(shortUrl);
@@ -45,6 +69,7 @@ namespace UrlShortener.Controllers
             return Ok(result);
         }
 
+        // GET: api/url/{shortCode}
         [HttpGet("{shortCode}")]
         public IActionResult GetOriginalUrl(string shortCode)
         {
