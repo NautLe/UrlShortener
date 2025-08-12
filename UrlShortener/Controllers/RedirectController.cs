@@ -17,9 +17,10 @@ namespace UrlShortener.Controllers
         {
             var link = _context.ShortUrls.FirstOrDefault(x => x.ShortCode == shortCode);
             if (link == null)
-            {
                 return NotFound("Short link not found.");
-            }
+
+            if (string.IsNullOrWhiteSpace(link.OriginalUrl))
+                return BadRequest("The original URL is missing.");
 
             link.ClickCount++;
             _context.SaveChanges();

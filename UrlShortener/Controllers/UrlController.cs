@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using UrlShortener.Data;
 using UrlShortener.Models;
+using UrlShortener.Services;
 using System;
+using System.Linq;
 
 namespace UrlShortener.Controllers
 {
@@ -10,10 +12,12 @@ namespace UrlShortener.Controllers
     public class UrlController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly ShortCodeGenerator _codeGenerator;
 
-        public UrlController(ApplicationDbContext context)
+        public UrlController(ApplicationDbContext context, ShortCodeGenerator codeGenerator)
         {
             _context = context;
+            _codeGenerator = codeGenerator;
         }
 
         [HttpPost("shorten")]
@@ -22,7 +26,21 @@ namespace UrlShortener.Controllers
             if (string.IsNullOrWhiteSpace(originalUrl) || !Uri.IsWellFormedUriString(originalUrl, UriKind.Absolute))
                 return BadRequest("Invalid URL format.");
 
-            var shortCode = Guid.NewGuid().ToString().Substring(0, 6);
+            var existing = _context.ShortUrls.FirstOrDefault(u => u.OriginalUrl == originalUrl);
+            if (existing != null)
+                return Ok($"{Request.Scheme}://{Request.Host}/{existing.ShortCode}");
+
+            var shortCode = _codeGenerator.Generate(originalUrl);
+
+            int counter = 1;
+            while (_context.ShortUrls.Any(u => u.ShortCode == shortCode))
+            {
+                shortCode = shortCode + counter;
+                if (shortCode.Length > 10)
+                    shortCode = shortCode.Substring(0, 10);
+                counter++;
+            }
+
             var shortUrl = new ShortUrl
             {
                 OriginalUrl = originalUrl,
@@ -34,6 +52,25 @@ namespace UrlShortener.Controllers
 
             var result = $"{Request.Scheme}://{Request.Host}/{shortCode}";
             return Ok(result);
+        }
+
+        [HttpGet("{shortCode}")]
+        public IActionResult GetOriginalUrl(string shortCode)
+        {
+            if (string.IsNullOrWhiteSpace(shortCode))
+                return BadRequest("Short code is required.");
+
+            var link = _context.ShortUrls.FirstOrDefault(u => u.ShortCode == shortCode);
+            if (link == null)
+                return NotFound("Short link not found.");
+
+            return Ok(new
+            {
+                OriginalUrl = link.OriginalUrl,
+                ShortCode = link.ShortCode,
+                ShortUrl = $"{Request.Scheme}://{Request.Host}/{link.ShortCode}",
+                ClickCount = link.ClickCount
+            });
         }
     }
 }
