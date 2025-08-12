@@ -3,6 +3,8 @@ using UrlShortener.Data;
 using UrlShortener.Models;
 using System;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Collections.Generic;
 
 namespace UrlShortener.Controllers
 {
@@ -20,7 +22,6 @@ namespace UrlShortener.Controllers
         [HttpPost]
         public IActionResult Shorten(string originalUrl)
         {
-            // Validate input
             if (string.IsNullOrWhiteSpace(originalUrl))
             {
                 ViewBag.Error = "URL cannot be empty.";
@@ -34,7 +35,7 @@ namespace UrlShortener.Controllers
                 return View("Index");
             }
 
-            // If already shortened → return existing
+            // Check if already shortened
             var existing = _context.ShortUrls.FirstOrDefault(x => x.OriginalUrl == validatedUri.ToString());
             if (existing != null)
             {
@@ -42,22 +43,18 @@ namespace UrlShortener.Controllers
                 return View("Index");
             }
 
-            // Create short code with "meaningful" style
-            var hostPart = validatedUri.Host.Replace("www.", "").Split('.')[0];
-            var shortHost = hostPart.Length > 3 ? hostPart.Substring(0, 3) : hostPart;
+            // Generate meaningful short code
+            var shortCode = GenerateMeaningfulShortCode(validatedUri.ToString());
 
-            var pathSegments = validatedUri.Segments
-                .Select(s => s.Trim('/'))
-                .Where(s => !string.IsNullOrWhiteSpace(s))
-                .Select(s => s.Length > 3 ? s.Substring(0, 3) : s)
-                .ToList();
-
-            var combined = shortHost + string.Join("", pathSegments);
-            var shortCode = new string(combined.Where(char.IsLetterOrDigit).ToArray());
-
-            // If duplicate short code, add a random number
-            if (_context.ShortUrls.Any(x => x.ShortCode == shortCode))
-                shortCode += new Random().Next(10, 99);
+            // Avoid duplicates
+            int counter = 1;
+            while (_context.ShortUrls.Any(u => u.ShortCode == shortCode))
+            {
+                shortCode = shortCode + counter;
+                if (shortCode.Length > 10)
+                    shortCode = shortCode.Substring(0, 10);
+                counter++;
+            }
 
             var shortUrl = new ShortUrl
             {
@@ -71,6 +68,47 @@ namespace UrlShortener.Controllers
 
             ViewBag.ShortUrl = $"{Request.Scheme}://{Request.Host}/{shortCode}";
             return View("Index");
+        }
+
+        private string GenerateMeaningfulShortCode(string url)
+        {
+            Uri uri = new Uri(url);
+            string domain = uri.Host.Replace("www.", "");
+            string path = uri.AbsolutePath.Trim('/');
+
+            // Mapping domain
+            Dictionary<string, string> domainMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                { "github.com", "gh" },
+                { "facebook.com", "fb" },
+                { "google.com", "gg" },
+                { "linkedin.com", "in" },
+                { "twitter.com", "tw" },
+                { "youtube.com", "yt" }
+            };
+
+            string domainShort = domainMap.ContainsKey(domain)
+                ? domainMap[domain]
+                : new string(domain.Take(3).ToArray());
+
+            // Path short
+            string[] pathParts = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            string pathShort = "";
+            foreach (var part in pathParts)
+            {
+                string clean = Regex.Replace(part, "[^a-zA-Z0-9]", "");
+                if (!string.IsNullOrEmpty(clean))
+                {
+                    pathShort += clean.Substring(0, Math.Min(3, clean.Length));
+                }
+            }
+
+            string finalCode = (domainShort + pathShort).ToLower();
+
+            if (finalCode.Length > 10)
+                finalCode = finalCode.Substring(0, 10);
+
+            return finalCode;
         }
     }
 }
