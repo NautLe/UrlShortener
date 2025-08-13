@@ -8,13 +8,13 @@ namespace UrlShortener.Validators
         public ShortenRequestValidator()
         {
             RuleFor(x => x.OriginalUrl)
-                .NotEmpty().WithMessage("URL không được để trống.")
+                .NotEmpty().WithMessage("URL cannot be empty!")
                 .Must(url => Uri.TryCreate(url, UriKind.Absolute, out _))
-                    .WithMessage("URL không hợp lệ.")
+                    .WithMessage("Invalid URL!")
                 .Must(url => !(url?.Contains("localhost") ?? false))
-                    .WithMessage("Không được rút gọn URL localhost.")
+                    .WithMessage("Do not shorten localhost URLs.")
                 .Must(url => !(url?.Contains("127.0.0.1") ?? false))
-                    .WithMessage("Không được rút gọn URL localhost (127.0.0.1).");
+                    .WithMessage("Do not shorten localhost URL (127.0.0.1)!");
         }
     }
 }

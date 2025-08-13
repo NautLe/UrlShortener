@@ -26,6 +26,7 @@ builder.Services.AddTransient<ShortCodeGenerator>();
 // DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 
@@ -47,3 +48,4 @@ app.MapControllerRoute(
     defaults: new { controller = "Redirect", action = "Go" });
 
 app.Run();
+    
